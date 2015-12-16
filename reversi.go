@@ -67,8 +67,8 @@ type Player struct {
 }
 
 type Board struct {
-	Score int
-	board [COORDINATE_SIZE][COORDINATE_SIZE]Stone
+	Score       int
+	Coordinates [COORDINATE_SIZE][COORDINATE_SIZE]Stone
 }
 
 type Stone struct {
@@ -98,14 +98,14 @@ func initBoard() Board {
 
 	for i = 0; i < COORDINATE_SIZE; i++ {
 		for j = 0; j < COORDINATE_SIZE; j++ {
-			B.board[i][j] = initStone(EMPTY)
+			B.Coordinates[i][j] = initStone(EMPTY)
 		}
 	}
 
-	B.board[3][3] = initStone(WHITE)
-	B.board[3][4] = initStone(BLACK)
-	B.board[4][3] = initStone(WHITE)
-	B.board[4][4] = initStone(BLACK)
+	B.Coordinates[3][3] = initStone(WHITE)
+	B.Coordinates[3][4] = initStone(BLACK)
+	B.Coordinates[4][3] = initStone(WHITE)
+	B.Coordinates[4][4] = initStone(BLACK)
 
 	return B
 }
@@ -119,7 +119,7 @@ func (b Board) printBoard() {
 
 	for i = 0; i < COORDINATE_SIZE; i++ {
 		for j = 0; j < COORDINATE_SIZE; j++ {
-			color = b.board[i][j].Color
+			color = b.Coordinates[i][j].Color
 			row_vector = ""
 			switch color {
 			case EMPTY:
