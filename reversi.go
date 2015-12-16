@@ -6,39 +6,8 @@ import (
 )
 
 func main() {
-	//fmt.Println("Hellog world")
-	// Number of Player
-	numPlayer := 2
-
-	// Initialize Players
-	black := Player{}
-	black.Color = 0
-	white := Player{}
-	white.Color = 1
-	fmt.Println(black.Color, white.Color)
-
-	// Who will be the first one?
-
-	//initialize 8x8board
-	playGround := Board{}
-	for i := 0; i < 8; i++ {
-		for j := 0; j < 8; j++ {
-			//playGround.board[i] = append(playGround.board[i], j)
-
-		}
-	}
-	fmt.Println(playGround.Score)
-	fmt.Println("  0  1  2  3  4  5  6  7")
-	fmt.Println("0[ ][ ][ ][ ][ ][ ][ ][ ]")
-	fmt.Println("1[ ][ ][ ][ ][ ][ ][ ][ ]")
-	fmt.Println("2[ ][ ][ ][ ][ ][ ][ ][ ]")
-	fmt.Println("3[ ][ ][ ][ ][ ][ ][ ][ ]")
-	fmt.Println("4[ ][ ][ ][ ][ ][ ][ ][ ]")
-	fmt.Println("5[ ][ ][ ][ ][ ][ ][ ][ ]")
-	fmt.Println("6[ ][ ][ ][ ][ ][ ][ ][ ]")
-	fmt.Println("7[ ][ ][ ][ ][ ][ ][ ][ ]")
-
-	// Put First 4 Stones
+	board := initBoard()
+	board.printBoard()
 
 	bothSurrender := false
 	for !bothSurrender {
@@ -77,8 +46,8 @@ type Stone struct {
 
 const (
 	EMPTY           = 0
-	BLACK           = 1
-	WHITE           = 2
+	BLACK           = -1
+	WHITE           = 1
 	COORDINATE_SIZE = 8
 	PLAYER_NUM      = 2
 	CELL_LEFT       = "["
@@ -110,6 +79,12 @@ func initBoard() Board {
 	return B
 }
 
+func (b Board) addStone(x, y, color int) {
+	// b.validate()
+	b.Coordinates[x][y].Color = color
+	// reverseColor()
+}
+
 func (b Board) printBoard() {
 	var i, j, color int
 	var row_vector string
@@ -118,9 +93,9 @@ func (b Board) printBoard() {
 	fmt.Println("  0  1  2  3  4  5  6  7")
 
 	for i = 0; i < COORDINATE_SIZE; i++ {
+		row_vector = ""
 		for j = 0; j < COORDINATE_SIZE; j++ {
 			color = b.Coordinates[i][j].Color
-			row_vector = ""
 			switch color {
 			case EMPTY:
 				row_vector += CELL_EMPTY
