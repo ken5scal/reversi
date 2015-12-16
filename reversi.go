@@ -5,29 +5,57 @@ import (
 	"strconv"
 )
 
+const (
+	EMPTY               = 0
+	BLACK               = -1
+	WHITE               = 1
+	COORDINATE_SIZE     = 8
+	PLAYER_NUM          = 2
+	NEIGHBOR_STONE_SIZE = 8
+	CELL_LEFT           = "["
+	CELL_RIGHT          = "]"
+	CELL_EMPTY          = "[ ]"
+)
+
 func main() {
+	var x, y, color int
+	var t0 = [2]int{1, 0}
+	var t45 = [2]int{1, 1}
+	var t90 = [2]int{0, 1}
+	var t135 = [2]int{-1, 1}
+	var t180 = [2]int{-1, 0}
+	var t225 = [2]int{-1, 1}
+	var t270 = [2]int{0, -1}
+	var t315 = [2]int{1, -1}
+	var dirs = [8][2]int{t0, t45, t90, t135,
+		t180, t225, t270, t315}
+
 	board := initBoard()
 	board.printBoard()
 
 	bothSurrender := false
 	for !bothSurrender {
 		// Wait For Stdin
-		for i := 0; i < numPlayer; i++ {
-			// Wait for coordinate input from Stdin
+		for i := 0; i < PLAYER_NUM; i++ {
+			if i == 0 {
+				fmt.Println("Black Player!")
+				color = BLACK
+			} else {
+				fmt.Println("White Player!")
+				color = WHITE
+			}
+			fmt.Println("Choose X(0~7):")
+			fmt.Scanf("%d", &x)
+			fmt.Println("Choose Y(0~7):")
+			fmt.Scanf("%d", &y)
 
-			// Validate Coordinate
-			// isValidate()
-			// if not:  redo
-
-			// Update Board by flipping Color
-
+			board.addStone(x, y, color)
+			board.printBoard()
 		}
 		// if Black.Pass == True && White.Pass == True
 		//	bothSurrender := truei
 		// break;
-
 	}
-
 }
 
 type Player struct {
@@ -43,17 +71,6 @@ type Board struct {
 type Stone struct {
 	Color int
 }
-
-const (
-	EMPTY           = 0
-	BLACK           = -1
-	WHITE           = 1
-	COORDINATE_SIZE = 8
-	PLAYER_NUM      = 2
-	CELL_LEFT       = "["
-	CELL_RIGHT      = "]"
-	CELL_EMPTY      = "[ ]"
-)
 
 func initStone(color int) Stone {
 	S := Stone{}
@@ -79,13 +96,11 @@ func initBoard() Board {
 	return B
 }
 
-func (b Board) addStone(x, y, color int) {
-	// b.validate()
+func (b *Board) addStone(x, y, color int) {
 	b.Coordinates[x][y].Color = color
-	// reverseColor()
 }
 
-func (b Board) printBoard() {
+func (b *Board) printBoard() {
 	var i, j, color int
 	var row_vector string
 
@@ -107,4 +122,29 @@ func (b Board) printBoard() {
 		}
 		fmt.Println(strconv.Itoa(i) + row_vector)
 	}
+}
+
+func isOutOfBounds(x, y int) bool {
+	if x < 0 || x >= COORDINATE_SIZE ||
+		y < 0 || y >= COORDINATE_SIZE {
+		return true
+	}
+	return false
+}
+
+func (b *Board) isValidCoodrinate(x, y, color int) bool {
+	// Out of Bounds
+	return !isOutOfBounds(x, y)
+
+	stone := b.Coordinates[x][y]
+
+	// If Stone is already Placed
+	if stone.Color != EMPTY {
+		return false
+	}
+
+	//var existDifferentColorDirection []int
+	//var neighborStone Stone
+
+	return true
 }
