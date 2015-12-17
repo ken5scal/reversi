@@ -17,44 +17,50 @@ const (
 	CELL_EMPTY          = "[ ]"
 )
 
-func main() {
-	var x, y, color int
-	var t0 = [2]int{1, 0}
-	var t45 = [2]int{1, 1}
-	var t90 = [2]int{0, 1}
-	var t135 = [2]int{-1, 1}
-	var t180 = [2]int{-1, 0}
-	var t225 = [2]int{-1, 1}
-	var t270 = [2]int{0, -1}
-	var t315 = [2]int{1, -1}
-	var dirs = [8][2]int{t0, t45, t90, t135,
-		t180, t225, t270, t315}
+var x, y, color int
 
+func main() {
 	board := initBoard()
 	board.printBoard()
+	player_black := Player{}
+	player_black.Color = BLACK
+	player_white := Player{}
+	player_white.Color = WHITE
+	var currentPlayer *Player
 
 	bothSurrender := false
 	for !bothSurrender {
-		// Wait For Stdin
+		player_black.Pass = false
+		player_white.Pass = false
 		for i := 0; i < PLAYER_NUM; i++ {
 			if i == 0 {
 				fmt.Println("Black Player!")
 				color = BLACK
+				currentPlayer = &player_black
 			} else {
 				fmt.Println("White Player!")
 				color = WHITE
+				currentPlayer = &player_white
 			}
 			fmt.Println("Choose X(0~7):")
 			fmt.Scanf("%d", &x)
 			fmt.Println("Choose Y(0~7):")
 			fmt.Scanf("%d", &y)
 
-			board.addStone(x, y, color)
+			if board.isValidCoodrinate(x, y, color) {
+				board.addStone(x, y, color)
+			} else {
+				fmt.Println("passed")
+				(*currentPlayer).Pass = true
+				//Validじゃなかったらパス扱い
+			}
 			board.printBoard()
 		}
-		// if Black.Pass == True && White.Pass == True
-		//	bothSurrender := truei
-		// break;
+		if player_black.Pass && player_white.Pass {
+			bothSurrender = true
+			fmt.Println("Game Over")
+			break
+		}
 	}
 }
 
@@ -70,6 +76,18 @@ type Board struct {
 
 type Stone struct {
 	Color int
+}
+
+type Direction struct {
+	dx int
+	dy int
+}
+
+func initDirection(dx, dy int) Direction {
+	D := Direction{}
+	D.dx = dx
+	D.dy = dy
+	return D
 }
 
 func initStone(color int) Stone {
@@ -90,14 +108,25 @@ func initBoard() Board {
 
 	B.Coordinates[3][3] = initStone(WHITE)
 	B.Coordinates[3][4] = initStone(BLACK)
-	B.Coordinates[4][3] = initStone(WHITE)
-	B.Coordinates[4][4] = initStone(BLACK)
+	B.Coordinates[4][3] = initStone(BLACK)
+	B.Coordinates[4][4] = initStone(WHITE)
 
 	return B
 }
 
 func (b *Board) addStone(x, y, color int) {
 	b.Coordinates[x][y].Color = color
+}
+
+func (b *Board) flipStone(x, y int) {
+	stone := &b.Coordinates[x][y]
+	if stone.Color == WHITE {
+		fmt.Println(x, y, "W2B")
+		stone.Color = BLACK
+	} else if stone.Color == BLACK {
+		fmt.Println(x, y, "B2W")
+		stone.Color = WHITE
+	}
 }
 
 func (b *Board) printBoard() {
@@ -134,7 +163,9 @@ func isOutOfBounds(x, y int) bool {
 
 func (b *Board) isValidCoodrinate(x, y, color int) bool {
 	// Out of Bounds
-	return !isOutOfBounds(x, y)
+	if isOutOfBounds(x, y) {
+		return false
+	}
 
 	stone := b.Coordinates[x][y]
 
@@ -143,8 +174,53 @@ func (b *Board) isValidCoodrinate(x, y, color int) bool {
 		return false
 	}
 
-	//var existDifferentColorDirection []int
-	//var neighborStone Stone
+	// Available Direction
+	dirs := initDirs()
+	for dir, _ := range dirs {
+		for i := 1; i < COORDINATE_SIZE; i++ {
+			next_x := x + i*dir.dx
+			next_y := y + i*dir.dy
+			if isOutOfBounds(next_x, next_y) {
+				break
+			} else if b.Coordinates[next_x][next_y].Color == EMPTY {
+				break
+			} else if color == b.Coordinates[next_x][next_y].Color {
+				for j := i - 1; j >= 1; j-- {
+					new_new_x := x + j*dir.dx
+					new_new_y := y + j*dir.dy
+					fmt.Println(dir, new_new_x, new_new_y, "Execute flipping")
+					b.flipStone(new_new_x, new_new_y)
+				}
+				break
+			} else if color != b.Coordinates[next_x][next_y].Color {
+				dirs[dir] = true
+			}
+		}
+	}
 
-	return true
+	for _, boolean := range dirs {
+		if boolean {
+			return true
+		}
+	}
+
+	return false
+}
+
+func initDirs() map[Direction]bool {
+	dirs := make(map[Direction]bool)
+
+	t0 := initDirection(1, 0)
+	t45 := initDirection(1, 1)
+	t90 := initDirection(0, 1)
+	t135 := initDirection(-1, 1)
+	t180 := initDirection(-1, 0)
+	t225 := initDirection(-1, 1)
+	t270 := initDirection(0, -1)
+	t315 := initDirection(1, -1)
+	Ds := [8]Direction{t0, t45, t90, t135, t180, t225, t270, t315}
+	for d := range Ds {
+		dirs[Ds[d]] = false //
+	}
+	return dirs
 }
