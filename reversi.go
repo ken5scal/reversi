@@ -26,10 +26,10 @@ func main() {
 	player_black.Color = BLACK
 	player_white := Player{}
 	player_white.Color = WHITE
+	// ポインタとして渡さないとあかん
 	var currentPlayer *Player
 
-	bothSurrender := false
-	for !bothSurrender {
+	for true {
 		player_black.Pass = false
 		player_white.Pass = false
 		for i := 0; i < PLAYER_NUM; i++ {
@@ -50,14 +50,15 @@ func main() {
 			if board.isValidCoodrinate(x, y, color) {
 				board.addStone(x, y, color)
 			} else {
+				//Validじゃなかったらパス扱い
 				fmt.Println("passed")
 				(*currentPlayer).Pass = true
-				//Validじゃなかったらパス扱い
 			}
 			board.printBoard()
 		}
+
+		// 両プレイヤーがパスしたら修了
 		if player_black.Pass && player_white.Pass {
-			bothSurrender = true
 			fmt.Println("Game Over")
 			break
 		}
